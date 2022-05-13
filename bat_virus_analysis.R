@@ -406,7 +406,7 @@ abline(h=0)
 for(i in 1:5) { 
     nd <- data.frame(HF10=0:100/100,Richness=rep(rich[i],101),
                  Clim="Warm",
-                 LatDD=rep(ldd["Cool"],101),
+                 LatDD=rep(ldd["Warm"],101),
                  Bat_genus=rep(NA,101),Species=rep(NA,101),IDstudy=rep(NA,101)
                  )
     pr <- predict(zi0modB, t="response", newdata=nd, re.form=NULL)
@@ -429,7 +429,7 @@ abline(h=0)
 for(i in 1:5) { 
     nd <- data.frame(HF10=0:100/100,Richness=rep(rich[i],101),
                  Clim="Sub",
-                 LatDD=rep(ldd["Cool"],101),
+                 LatDD=rep(ldd["Sub"],101),
                  Bat_genus=rep(NA,101),Species=rep(NA,101),IDstudy=rep(NA,101)
                  )
     pr <- predict(zi0modB, t="response", newdata=nd, re.form=NULL)
@@ -452,7 +452,7 @@ abline(h=0)
 for(i in 1:5) { 
     nd <- data.frame(HF10=0:100/100,Richness=rep(rich[i],101),
                  Clim="Tropical",
-                 LatDD=rep(ldd["Cool"],101),
+                 LatDD=rep(ldd["Tropical"],101),
                  Bat_genus=rep(NA,101),Species=rep(NA,101),IDstudy=rep(NA,101)
                  )
     pr <- predict(zi0modB, t="response", newdata=nd, re.form=NULL)
@@ -507,7 +507,7 @@ abline(h=0)
 for(i in 1:4) { 
     nd <- data.frame(HF10=0:100/100,Richness=rep(rich[i],101),
                  Clim="Warm",
-                 LatDD=rep(ldd["Cool"],101),
+                 LatDD=rep(ldd["Warm"],101),
                  Bat_genus=rep(NA,101),Species=rep(NA,101),IDstudy=rep(NA,101)
                  )
     pr <- predict(zi0modB, t="conditional", newdata=nd, re.form=NULL)
@@ -550,7 +550,7 @@ abline(h=0)
 for(i in 1:4) { 
     nd <- data.frame(HF10=0:100/100,Richness=rep(rich[i],101),
                  Clim="Tropical",
-                 LatDD=rep(ldd["Cool"],101),
+                 LatDD=rep(ldd["Tropical"],101),
                  Bat_genus=rep(NA,101),Species=rep(NA,101),IDstudy=rep(NA,101)
                  )
     pr <- predict(zi0modB, t="conditional", newdata=nd, re.form=NULL)
