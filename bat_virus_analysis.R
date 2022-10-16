@@ -22,7 +22,7 @@ set.seed(123)
 ## fit a first model
 
 zimod <- glmmTMB(cbind(N_pos,N_sampled-N_pos) ~ HF10  +  Richness + abs(LatDD) +
-                     (1|Clim) + (1| Bat_genus / Species) + (1 | IDstudy),
+                     (1|Clim) + (1| Species) + (1 | IDstudy),
                  ziformula= ~ HF10 +  Richness + abs(LatDD) +  (1|Clim) +
                      (1| Bat_genus / Species) + (1 | IDstudy),
                  data, family="binomial")
@@ -82,7 +82,7 @@ kruskal.test(simres$scaledResiduals~data$sampletime)
 ## model with no human impact
 zi0mod <- glmmTMB(cbind(N_pos,N_sampled-N_pos) ~ Richness +
                       (1|Clim) + abs(LatDD) +
-                      (1| Bat_genus / Species) + (1 | IDstudy),
+                      (1| Species) + (1 | IDstudy),
                   ziformula= ~ Richness +  (1|Clim) + abs(LatDD) +
                       (1| Bat_genus / Species) + (1 | IDstudy),
                   data, family="binomial")
@@ -90,7 +90,7 @@ zi0mod <- glmmTMB(cbind(N_pos,N_sampled-N_pos) ~ Richness +
 ## model with human impact on conditional model (prevalence) but not on zero
 ## inflation (presence)
 zi0modB <- glmmTMB(cbind(N_pos,N_sampled-N_pos) ~ HF10 +  Richness  + abs(LatDD)
-                   +  (1|Clim) + (1| Bat_genus / Species) + (1 | IDstudy),
+                   +  (1|Clim) + (1| Species) + (1 | IDstudy),
                  ziformula= ~ Richness  + abs(LatDD) +  (1|Clim) +
                      (1| Bat_genus / Species) + (1 | IDstudy),
                  data, family="binomial")
@@ -111,17 +111,17 @@ if(file.exists("lrtsimclim.RData")) {
         while(is.na(llr[i])) {
             sim0dat <- simulate(zi0mod)
             s0 <- try(logLik(glmmTMB(as.matrix(sim0dat) ~ Richness   + abs(LatDD)+  (1|Clim) +
-                                         (1| Bat_genus / Species) + (1 | IDstudy),
+                                         (1| Species) + (1 | IDstudy),
                                      ziformula= ~ Richness  + abs(LatDD) +  (1|Clim) +
                                          (1| Bat_genus / Species) + (1 | IDstudy),
                                      data, family="binomial")))
             s0B <- try(logLik(glmmTMB(as.matrix(sim0dat) ~ HF10   + abs(LatDD)+  Richness  
-                                      +  (1|Clim) + (1| Bat_genus / Species) + (1 | IDstudy),
+                                      +  (1|Clim) + (1| Species) + (1 | IDstudy),
                                      ziformula= ~ Richness + abs(LatDD) +  (1|Clim) +
                                          (1| Bat_genus / Species) + (1 | IDstudy),
                                      data, family="binomial")))
             s1 <- try(logLik(glmmTMB(as.matrix(sim0dat) ~ HF10   + abs(LatDD)+  Richness  
-                                     +  (1|Clim) + (1| Bat_genus / Species) + (1 | IDstudy),
+                                     +  (1|Clim) + (1| Species) + (1 | IDstudy),
                                      ziformula= ~ HF10 +  Richness  + abs(LatDD) +  (1|Clim) +
                                          (1| Bat_genus / Species) + (1 | IDstudy),
                                      data, family="binomial")))
@@ -139,12 +139,12 @@ if(file.exists("lrtsimclim.RData")) {
         while(is.na(llrB[i])) {
             sim0dat <- simulate(zi0modB)
             s0B <- try(logLik(glmmTMB(as.matrix(sim0dat) ~ HF10   + abs(LatDD)+  Richness 
-                                      + (1|Clim) + (1| Bat_genus / Species) + (1 | IDstudy),
+                                      + (1|Clim) + (1| Species) + (1 | IDstudy),
                                      ziformula= ~ Richness  + abs(LatDD) +  (1|Clim) +
                                          (1| Bat_genus / Species) + (1 | IDstudy),
                                      data, family="binomial")))
             s1 <- try(logLik(glmmTMB(as.matrix(sim0dat) ~ HF10   + abs(LatDD) +  Richness 
-                                     + (1|Clim) + (1| Bat_genus / Species) + (1 | IDstudy),
+                                     + (1|Clim) + (1| Species) + (1 | IDstudy),
                                      ziformula= ~ HF10 +  Richness  + abs(LatDD) +  (1|Clim) +
                                          (1| Bat_genus / Species) + (1 | IDstudy),
                                      data, family="binomial")))
@@ -173,21 +173,21 @@ abline(v=logLik(zimod)-logLik(zi0modB), col="red", lwd=2)
 
 ## We calculate p-values for these comparisons:
 
-## Null model: HF50 no impact,
+## Null model: HF10 no impact,
 ## alternative model: HF50 has impact on virus presence and infection rate.
 ## number of simulations (out of 1000) that led to a larger likelihood ratio:
 sum(logLik(zimod)-logLik(zi0mod) <= llr)
 ## p-value:
 (sum(logLik(zimod)-logLik(zi0mod) <= llr) + 1) / (1 + length(llr))
 
-## Null model: HF50 no impact,
+## Null model: HF10 no impact,
 ## alternative model: HF50 has impact on infection rate but not on presence.
 ## number of simulations (out of 1000) that led to a larger likelihood ratio:
 sum(logLik(zi0modB)-logLik(zi0mod) <= llr0B)
 ## p-value:
 (sum(logLik(zi0modB)-logLik(zi0mod) <= llr0B) + 1) / (1 + length(llr0B)) 
 
-## Null model: HF50 has impact on infection rate but not on presence,
+## Null model: HF10 has impact on infection rate but not on presence,
 ## alternative model: HF50 has impact on virus presence and infection rate.
 ## number of simulations (out of 1000) that led to a larger likelihood ratio:
 sum(logLik(zimod)-logLik(zi0modB) <= llrB)
@@ -201,7 +201,6 @@ AIC(zi0mod, zi0modB, zimod)
 ## The winner of the AIC comparison is the model zi0modB in which humas have
 ## an impact on the infection rate of infected populations but not on the
 ## probability that a population is infected.
-
 
 ### Testing variance components for species and genera
 ## We apply likelihood-ratio tests with chi-square approximation to test whether the
@@ -299,6 +298,7 @@ plot(0:100/100,rep(1,101),t="l",ylim=c(0,max(1-pr$fit+pr$se)),
 lines(0:100/100,1-pr$fit,col="red")
 lines(0:100/100,1-pr$fit+pr$se,lty=2,col="red")
 lines(0:100/100,1-pr$fit-pr$se,lty=2,col="red")
+abline(h=1)
 abline(h=0)
 
 pr <- predict(zi0modB, t="conditional", newdata=nd, re.form=NULL,se.fit=TRUE)
@@ -310,6 +310,32 @@ lines(0:100/100,pr$fit,col="red")
 lines(0:100/100,pr$fit+pr$se,lty=2,col="red")
 lines(0:100/100,pr$fit-pr$se,lty=2,col="red")
 abline(h=0)
+
+
+f <- function(x) 1/(1+exp(-x))
+
+pr <- predict(zi0modB, t="zlink", newdata=nd, re.form=NULL,
+              se.fit=TRUE, allow.new.levels=TRUE)
+plot(0:100/100,rep(1,101),t="l",ylim=c(0,1),
+     ylab="Probability of presence of infection",
+     xlab="Human impact measure H10")
+lines(0:100/100,1-f(pr$fit), lwd=2)
+lines(0:100/100,1-f(pr$fit+2*pr$se),lty=2, lwd=2)
+lines(0:100/100,1-f(pr$fit-2*pr$se),lty=2, lwd=2)
+abline(h=0)
+abline(h=1)
+
+pr <- predict(zi0modB, t="link", newdata=nd, re.form=NULL,
+              se.fit=TRUE, allow.new.levels=TRUE)
+plot(0:100/100,rep(1,101),t="l",ylim=c(0, 0.2),
+     ylab="Prevalence in case of present infection",
+     xlab="Human impact measure H10")
+lines(0:100/100,f(pr$fit),lwd=2)
+lines(0:100/100,f(pr$fit+2*pr$se),lty=2, lwd=2)
+lines(0:100/100,f(pr$fit-2*pr$se),lty=2, lwd=2)
+abline(h=0)
+abline(h=1)
+
 
 ## Similar for each climate zone and mammals richness and the average distance to the equator in this climate zone:
 
@@ -463,109 +489,130 @@ legend("bottomright", pch=15, legend=rich, col=colo, title="Richness",
 
 ## dev.print(device=svg, file="SVG-Figs/zi0Bavgclripredict-4.svg")
 
+lines(gpr$x, gpr$conf.high*100, col=colo[1], lty=2)
+for(i in 2:5) {
+    gpr <- ggpredict(zi0modB, "HF10 [all]", type="zi_random", cond=c(Clim="Tropical", Richness=rich[i]))
+    lines(gpr$x, gpr$predicted*100, col=colo[i])
+    lines(gpr$x, gpr$conf.low*100, col=colo[i], lty=2)
+    lines(gpr$x, gpr$conf.high*100, col=colo[i], lty=2)
+}
+
+@ 
+
 ## The next plots show predicted prevalences (conditioned on presence of the virus) 
 ## for combinations of climate
 ## zone and mammals richness, and the average distance to the equator in this climate zone.
-## From top to bottom the lines refer to (mammalian) species richness values of 10, 50, 100,
-## and 150.
-## (For cool climate the latter two are shown in grey as these values are not realistic
-## for cool climate.)
 ## Note that the predictions refer to an average species of our dataset (that is, species
 ## effect is not only averaged over the species in the repective climate zone).
 ## And the plot are in percent now.
+## The confidence intervals are are based on 1.96-standard-error approximation on the link scale. 
+
 
 ldd <- round(tapply(abs(data$LatDD), data$Clim, mean))
-rich <- c(10, 50, 100, 150)
-(colo <- c(rgb(0.4,0.4,1), rgb(0,0,0.8), rgb(.5,.5,.5), rgb(.5,.5,.5)))
+rich <- c(10, 60, 160)
 
-plot(0:100/100, rep(1,101),t="l", ylim=c(0,18),
-     ylab="Prevalence [%]",
-     main="Cool climate",
-     xlab="Human impact measure HF10")
-abline(h=0)
-for(i in 1:4) { 
-    nd <- data.frame(HF10=0:100/100,Richness=rep(rich[i],101),
+(colo <- c(rgb(.745,.91,1.),  rgb(.0,.443,.996), 
+           rgb(.0,.145,.4511)))
+
+
+f <- function(x) 1/(1+exp(-x))
+
+plot(0:100/100,rep(0,101),t="l",ylim=c(0,25),
+     ylab="Prevalence [%], conditional",
+     main="Cool-Temperate",
+     xlab="Human impact measure H10")
+for(i in 1:3) { 
+    nd <- data.frame(HF10=0:100/100, Richness=rep(rich[i],101),
                  Clim="Cool",
                  LatDD=rep(ldd["Cool"],101),
                  Bat_genus=rep(NA,101),Species=rep(NA,101),IDstudy=rep(NA,101)
                  )
-    pr <- predict(zi0modB, t="conditional", newdata=nd, re.form=NULL)
-    lines(0:100/100, 100*pr, col=colo[i])
+    pr <- predict(zi0modB, t="link", newdata=nd, re.form=NULL, se.fit=TRUE)
+    lines(0:100/100, 100*f(pr$fit), col=colo[i])
+    lines(0:100/100, 100*f(pr$fit+1.96*pr$se), lty=2, col=colo[i])
+    lines(0:100/100, 100*f(pr$fit-1.96*pr$se), lty=2, col=colo[i])
 }
 legend("topleft", pch=15, legend=rich, col=colo, title="Richness",
        bg="white")
 
-## dev.print(device=svg, file="SVG-Figs/zi0Bavgclripredictpr-1.svg")
 
-(colo <- c(rgb(0.8,0.4,1), rgb(0.6,0.2,0.9), rgb(.4,0,0.8), rgb(.3,0,.7)))
+(colo <- c(rgb(0.91,0.745,0.996), rgb(.667,0,0.898), 
+            rgb(.302,.0,.455)))
 
-plot(0:100/100,rep(1,101),t="l",ylim=c(0,18),
-     ylab="Prevalence [%]",
-     main="Warm climate",
-     xlab="Human impact measure HF10")
+
+plot(0:100/100,rep(0,101),t="l",ylim=c(0,25),
+     ylab="Prevalence [%], conditional",
+     main="Warm-Temperate",
+     xlab="Human impact measure H10")
 abline(h=0)
-for(i in 1:4) { 
+for(i in 1:3) { 
     nd <- data.frame(HF10=0:100/100,Richness=rep(rich[i],101),
-                 Clim="Warm",
+                 Clim="Warm-Temperate",
                  LatDD=rep(ldd["Warm"],101),
                  Bat_genus=rep(NA,101),Species=rep(NA,101),IDstudy=rep(NA,101)
                  )
-    pr <- predict(zi0modB, t="conditional", newdata=nd, re.form=NULL)
-    lines(0:100/100, 100*pr, col=colo[i])
+    pr <- predict(zi0modB, t="link", newdata=nd, re.form=NULL, se.fit=TRUE)
+    lines(0:100/100, 100*f(pr$fit), col=colo[i])
+    lines(0:100/100, 100*f(pr$fit+1.96*pr$se), lty=2, col=colo[i])
+    lines(0:100/100, 100*f(pr$fit-1.96*pr$se), lty=2, col=colo[i])
 }
-legend("bottomright", pch=15, legend=rich, col=colo, title="Richness",
+legend(0.76, 22.3,pch=15, legend=rich, col=colo, title="Richness",
        bg="white")
 
-## dev.print(device=svg, file="SVG-Figs/zi0Bavgclripredictpr-2.svg")
+
+(colo <- c(rgb(1.,.655,.498),  rgb(.898,.298,0.), 
+            rgb(.455,.149,.0)))
 
 
-(colo <- c(rgb(1,0,0.7), rgb(1,0,0.5), rgb(.9,0,0.4), rgb(.7,0,.2)))
-
-plot(0:100/100,rep(1,101),t="l",ylim=c(0, 18),
-     ylab="Prevalence [%]",
-     main="Sub-tropical climate",
-     xlab="Human impact measure HF10")
+plot(0:100/100,rep(0,101),t="l",ylim=c(0,25),
+     ylab="Prevalence [%], conditional",
+     main="Sub-Tropical",
+     xlab="Human impact measure H10")
 abline(h=0)
-for(i in 1:4) { 
+for(i in 1:3) { 
     nd <- data.frame(HF10=0:100/100,Richness=rep(rich[i],101),
-                 Clim="Sub",
+                 Clim="Sub-Tropical",
                  LatDD=rep(ldd["Sub"],101),
                  Bat_genus=rep(NA,101),Species=rep(NA,101),IDstudy=rep(NA,101)
                  )
-    pr <- predict(zi0modB, t="conditional", newdata=nd, re.form=NULL)
-    lines(0:100/100, 100*pr, col=colo[i])
+    pr <- predict(zi0modB, t="link", newdata=nd, re.form=NULL, se.fit=TRUE)
+    lines(0:100/100, 100*f(pr$fit), col=colo[i])
+    lines(0:100/100, 100*f(pr$fit+1.96*pr$se), lty=2, col=colo[i])
+    lines(0:100/100, 100*f(pr$fit-1.96*pr$se), lty=2, col=colo[i])
 }
-legend("bottomright", pch=15, legend=rich, col=colo, title="Richness",
+legend(0.76, 21, pch=15, legend=rich, col=colo, title="Richness",
        bg="white")
 
-## dev.print(device=svg, file="SVG-Figs/zi0Bavgclripredictpr-3.svg")
 
-(colo <- c(rgb(1,0.7,0.4), rgb(1,0.5,0.2), rgb(.8,0.4,0), rgb(.6,.2, 0)))
+(colo <- c(rgb(.906,.902,.0),  rgb(.902,.596,.0), 
+            rgb(.451,.298,.0)))
 
-plot(0:100/100,rep(1,101),t="l",ylim=c(0, 18),
+
+plot(0:100/100,rep(0,101),t="l",ylim=c(0,25),
      ylab="Prevalence [%]",
-     main="Tropical climate",
-     xlab="Human impact measure HF10")
+     main="Tropical",
+     xlab="Human impact measure H10")
 abline(h=0)
-for(i in 1:4) { 
+for(i in 1:3) { 
     nd <- data.frame(HF10=0:100/100,Richness=rep(rich[i],101),
                  Clim="Tropical",
                  LatDD=rep(ldd["Tropical"],101),
                  Bat_genus=rep(NA,101),Species=rep(NA,101),IDstudy=rep(NA,101)
                  )
-    pr <- predict(zi0modB, t="conditional", newdata=nd, re.form=NULL)
-    lines(0:100/100, 100*pr, col=colo[i])
+    pr <- predict(zi0modB, t="link", newdata=nd, re.form=NULL, se.fit=TRUE)
+    lines(0:100/100, 100*f(pr$fit), col=colo[i])
+    lines(0:100/100, 100*f(pr$fit+1.96*pr$se), lty=2, col=colo[i])
+    lines(0:100/100, 100*f(pr$fit-1.96*pr$se), lty=2, col=colo[i])
 }
 legend("topleft", pch=15, legend=rich, col=colo, title="Richness",
        bg="white")
 
-## dev.print(device=svg, file="SVG-Figs/zi0Bavgclripredictpr-4.svg")
 
 ## The following plots show for the species that are known to live in the respective (wider)
 ## area and are in the scope of our study how the probability of an individual to be infected
 ## depends on HF10 (according to our model prediction, of course).
 
-r <- read.csv("China_points.csv",dec=",")
+r <- read.csv("../data/China_points.csv",dec=",")
 ep <- r[1:7] 
 for(i in 8:46) {
     d <- r[r[i]!="",c(1:6,i)]
@@ -578,35 +625,53 @@ ep$Species_ep <- sapply(sapply(as.character(ep$Bat_species), strsplit, "_"),"[",
 ep$Species <-  paste(ep$Bat_genus,ep$Species_ep)
 ep$place <- paste(ep$Country, ep$locality)
 
-par(mfcol=c(1,2))
-for(pl in unique(ep$place)) {
-    plot(c(), main=pl, xlim=c(0,1), ylim=c(0,35),
-         ylab="Proportion of infected individuals [%]",
-         xlab="Human impact measure HF10")
-    abline(h=0)
-    sppresds <- numeric()
-    for(sp in unique(ep$Species[ep$place==pl])) {
-        i <- which(ep$place==pl & ep$Species==sp)[1]
-        nd <- data.frame(HF10=0:100/100,Richness=rep(ep$Mammals[i],101),
-                         Clim=rep(ep$Clim[i],101), LatDD=rep(ep$lat[i],101),
-                         Bat_genus=rep(ep$Bat_genus[i],101), Species=rep(ep$Species[i],101), IDstudy=rep(NA,101)
-                         )
-        pr <- predict(zi0modB, t="response", newdata=nd, re.form=NULL,se.fit=TRUE)
-        lines(0:100/100, 100*pr$fit, col="brown")
-        sppresds[sp] <- pr$fit[50]
-    }
-    if( !(sp %in% data$Species) ) cat("Species ", sp," not found.\n")
-    cat("\nLines in plot for ",pl, "refer to (from top to bottom):\n")
-    cat(names(sppresds[order(-sppresds)]), sep=", ", fill=70)
-    cat("\n")
+par(mfcol=c(1,1))
+pl <- "China central-east (SE Hubei)"
+plot(c(), main=pl, xlim=c(0,1), ylim=c(0,60),
+     ylab="Proportion of infected individuals [%]",
+     xlab="Human impact measure HF10")
+abline(h=0)
+sppresds <- numeric()
+for(sp in unique(ep$Species[ep$place==pl])) {
+    i <- which(ep$place==pl & ep$Species==sp)[1]
+    nd <- data.frame(HF10=0:100/100,Richness=rep(ep$Mammals[i],101),
+                     Clim=rep(ep$Clim[i],101), LatDD=rep(ep$lat[i],101),
+                     Bat_genus=rep(ep$Bat_genus[i],101), Species=rep(ep$Species[i],101), IDstudy=rep(NA,101)
+                     )
+    pr <- predict(zi0modB, t="response", newdata=nd, re.form=NULL,se.fit=TRUE)
+    lines(0:100/100, 100*pr$fit)
+    sppresds[sp] <- pr$fit[50]
 }
+if( !(sp %in% data$Species) ) cat("Species ", sp," not found.\n")
+cat("\nLines in plot for ",pl, "refer to (from top to bottom):\n")
+cat(names(sppresds[order(-sppresds)]), sep=", ", fill=70)
+cat("\n")
 
+pl <- "China southwest (Yunnan)" 
+plot(c(), main=pl, xlim=c(0,1), ylim=c(0,60),
+     ylab="Proportion of infected individuals [%]",
+     xlab="Human impact measure HF10")
+abline(h=0)
+sppresds <- numeric()
+for(sp in unique(ep$Species[ep$place==pl])) {
+    i <- which(ep$place==pl & ep$Species==sp)[1]
+    nd <- data.frame(HF10=0:100/100,Richness=rep(ep$Mammals[i],101),
+                     Clim=rep(ep$Clim[i],101), LatDD=rep(ep$lat[i],101),
+                     Bat_genus=rep(ep$Bat_genus[i],101), Species=rep(ep$Species[i],101), IDstudy=rep(NA,101)
+                     )
+    pr <- predict(zi0modB, t="response", newdata=nd, re.form=NULL,se.fit=TRUE)
+    lines(0:100/100, 100*pr$fit)
+    sppresds[sp] <- pr$fit[50]
+}
+if( !(sp %in% data$Species) ) cat("Species ", sp," not found.\n")
+cat("\nLines in plot for ",pl, "refer to (from top to bottom):\n")
+cat(names(sppresds[order(-sppresds)]), sep=", ", fill=70)
+cat("\n")
 
 ### Predictions of zi0modB as a function of the parameter values
 
 ranef(zi0modB)$zi$Clim
 ranef(zi0modB)$cond$Clim
-
 
 r <- 90
 l <- 20
@@ -620,16 +685,34 @@ fixef(zi0modB)
 (1-f(fz[["(Intercept)"]]+fz[["Richness"]]*r+fz[["abs(LatDD)"]]*abs(l)+c1))*
     (f(fc[["(Intercept)"]] + fc[["HF10"]]*h+fc[["Richness"]]*r+fc[["abs(LatDD)"]]*abs(l)+c2))
 
-## Let's check that the R predict command gives the same value for this model
+## Confirm that the R predict command gives the same value for this model
 predict(zi0modB, t="response", 
         newdata=data.frame(HF10=h,Richness=90,LatDD=20,Clim="Cool",
                            Bat_genus=NA,Species=NA,IDstudy=NA), re.form=NULL)
 
 
 ## For comparison also with rounded values as given above:
-c1 <- 0.2108
-c2 <- -0.4972
-(1-f(-0.659-0.00000553*r -0.0125 * abs(l) + c1))*(f(-2.508 + 0.576*h -0.001198*r -0.00098*abs(l) + c2))
+c1 <- 0.138
+c2 <- -0.4732
+(1-f(-0.7764 -0.0002647* r -0.00665* abs(l) + c1))*(
+    f(-2.6719 + 0.4492 * h -0.0004724 * r +0.00779*abs(l) + c2))
+
+## prediction of conditional prevalence with 95 \% confidence intervals:
+
+zi0modB_predict_cond_confint <- function(richness, hf10, latitude, climate) {
+    transf <- function(x) 1/(1+exp(-x))
+    nd <- data.frame(HF10=hf10,Richness=richness, Clim=climate, LatDD=latitude,
+                     Bat_genus=NA, Species=NA, IDstudy=NA)
+    pr <- predict(zi0modB, t="link", newdata=nd, re.form=NULL, se.fit=TRUE, allow.new.levels=TRUE)
+    cbind(transf(pr$fit-2*pr$se), transf(pr$fit), transf(pr$fit+2*pr$se))
+}
+
+## example:
+zi0modB_predict_cond_confint(richness = 90, hf10 = 0.5, latitude = 20, climate = "Cool")
+
+## for maps apply to data simultaneously like this:
+## zi0modB_predict_cond_confint(richness = data$Richness, hf10 = data$HF10, latitude = abs(data$LatDD),
+##                climate = data$Clim)
 
 
 ### Plots for HF10-effects on infection probability for various values of Richness and different Climate zones
@@ -798,3 +881,80 @@ Rcontrast(tree, nresB,
           "/usr/opt/src/phylip-3.697/exe/")
 Rcontrast(tree, nres0,
           "/usr/opt/src/phylip-3.697/exe/")
+
+## Results for HF50 instead of HF10 are similar with a slighltly weaker effect:
+
+summary(glmmTMB(cbind(N_pos,N_sampled-N_pos) ~ HF50  +  Richness + abs(LatDD) +
+                     (1|Clim) + (1| Species) + (1 | IDstudy),
+                 ziformula= ~ HF50 +  Richness + abs(LatDD) +  (1|Clim) +
+                     (1| Bat_genus / Species) + (1 | IDstudy),
+                 data, family="binomial"))
+
+
+## Here with model corresponding to our main model:
+
+summary(glmmTMB(cbind(N_pos,N_sampled-N_pos) ~ HF50  +  Richness + abs(LatDD) +
+                     (1|Clim) + (1| Species) + (1 | IDstudy),
+                 ziformula= ~ Richness + abs(LatDD) +  (1|Clim) +
+                     (1| Bat_genus / Species) + (1 | IDstudy),
+                 data, family="binomial"))
+
+## Separate models for different kinds of human impact
+
+pval <- numeric()
+for(f in c("HF10","Ag10","Bu10","En10","In10","Tr10")) {
+    print(f)
+    mod <- glmmTMB(cbind(N_pos,N_sampled-N_pos) ~ data[,f] +  Richness  + abs(LatDD)
+                   +  (1|Clim) + (1| Species) + (1 | IDstudy),
+                 ziformula= ~ Richness  + abs(LatDD) +  (1|Clim) +
+                     (1| Bat_genus / Species) + (1 | IDstudy),
+                 data, family="binomial")
+    print(summary(mod)$coef$cond[2,])
+    pval <- c(pval, summary(mod)$coefficients$cond[2,4])
+}
+p.adjust(pval[2:6], method="holm")
+
+summary(glmmTMB(cbind(N_pos,N_sampled-N_pos) ~ Ag10 + En10 + Richness + abs(LatDD)
+               +  (1|Clim) + (1| Species) + (1 | IDstudy),
+               ziformula= ~ Richness  + abs(LatDD) +  (1|Clim) +
+                   (1| Bat_genus / Species) + (1 | IDstudy),
+               data, family="binomial"))
+
+## Separate models for different types of human impact on 50 km scale
+
+for(f in c("HF50","Ag50","Bu50","En50","In50","Tr50")) {
+    print(f)
+    mod <- glmmTMB(cbind(N_pos,N_sampled-N_pos) ~ data[,f] +  Richness  + abs(LatDD)
+                   +  (1|Clim) + (1| Species) + (1 | IDstudy),
+                 ziformula= ~ Richness  + abs(LatDD) +  (1|Clim) +
+                     (1| Bat_genus / Species) + (1 | IDstudy),
+                 data, family="binomial")
+    print(summary(mod)$coef$cond[2,])
+}
+
+## adding human impact factors to our main model, first for conditional model:
+
+for(f in c("Ag10", "Bu10", "En10", "In10", "Tr10", "HF50", "Ag50", "Bu50","En50", "In50", "Tr50" )) {
+    cat("\n", f,":\n")
+    mod <- glmmTMB(cbind(N_pos,N_sampled-N_pos) ~ data[,f] + HF10 +  Richness  + abs(LatDD)
+                   +  (1|Clim) + (1| Species) + (1 | IDstudy),
+                 ziformula= ~ Richness  + abs(LatDD) +  (1|Clim) +
+                     (1| Bat_genus / Species) + (1 | IDstudy),
+                 data, family="binomial")
+    print(summary(mod)$coef$cond[3:2,])
+}
+
+## now for zero-inflation model:
+
+for(f in c("Ag10", "Bu10", "En10", "In10", "Tr10", "HF50", "Ag50", "Bu50","En50", "In50", "Tr50" )) {
+    cat("\n", f,":\n")
+    mod <- glmmTMB(cbind(N_pos,N_sampled-N_pos) ~ HF10 +  Richness  + abs(LatDD)
+                   +  (1|Clim) + (1| Species) + (1 | IDstudy),
+                 ziformula= ~ data[,f] + Richness  + abs(LatDD) +  (1|Clim) +
+                     (1| Bat_genus / Species) + (1 | IDstudy),
+                 data, family="binomial")
+    cat("        Estimate   Std. Error      z value     Pr(>|z|)\n")
+    cat("HF10:", summary(mod)$coef$cond[2,],"\n")
+    cat(f,":",summary(mod)$coef$zi[2,],"\n")
+}
+
