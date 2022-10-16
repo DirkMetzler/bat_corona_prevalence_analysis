@@ -497,8 +497,6 @@ for(i in 2:5) {
     lines(gpr$x, gpr$conf.high*100, col=colo[i], lty=2)
 }
 
-@ 
-
 ## The next plots show predicted prevalences (conditioned on presence of the virus) 
 ## for combinations of climate
 ## zone and mammals richness, and the average distance to the equator in this climate zone.
