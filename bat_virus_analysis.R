@@ -174,21 +174,21 @@ abline(v=logLik(zimod)-logLik(zi0modB), col="red", lwd=2)
 ## We calculate p-values for these comparisons:
 
 ## Null model: HF10 no impact,
-## alternative model: HF50 has impact on virus presence and infection rate.
+## alternative model: HF10 has impact on virus presence and infection rate.
 ## number of simulations (out of 1000) that led to a larger likelihood ratio:
 sum(logLik(zimod)-logLik(zi0mod) <= llr)
 ## p-value:
 (sum(logLik(zimod)-logLik(zi0mod) <= llr) + 1) / (1 + length(llr))
 
 ## Null model: HF10 no impact,
-## alternative model: HF50 has impact on infection rate but not on presence.
+## alternative model: HF10 has impact on infection rate but not on presence.
 ## number of simulations (out of 1000) that led to a larger likelihood ratio:
 sum(logLik(zi0modB)-logLik(zi0mod) <= llr0B)
 ## p-value:
 (sum(logLik(zi0modB)-logLik(zi0mod) <= llr0B) + 1) / (1 + length(llr0B)) 
 
 ## Null model: HF10 has impact on infection rate but not on presence,
-## alternative model: HF50 has impact on virus presence and infection rate.
+## alternative model: HF10 has impact on virus presence and infection rate.
 ## number of simulations (out of 1000) that led to a larger likelihood ratio:
 sum(logLik(zimod)-logLik(zi0modB) <= llrB)
 ## p-value:
